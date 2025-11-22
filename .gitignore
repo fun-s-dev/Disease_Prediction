@@ -8,6 +8,9 @@ env/
 venv/
 ENV/
 .venv
+*.egg-info/
+dist/
+build/
 
 # Database
 *.db
@@ -15,17 +18,12 @@ ENV/
 *.sqlite3
 instance/
 
-# Model files (optional - uncomment if you don't want to track models)
-# models/*.pkl
-
 # IDE
 .vscode/
 .idea/
 *.swp
 *.swo
 *~
-
-# OS
 .DS_Store
 Thumbs.db
 
@@ -35,8 +33,39 @@ Thumbs.db
 # Environment variables
 .env
 .env.local
+.env.*.local
 
-# Evaluation outputs
+# Evaluation outputs (regenerate locally)
 evaluation_confusion_matrix.png
 evaluation_report.txt
+shap_feature_importance.csv
 
+# Test/debug files
+test_form_submission.py
+
+# Temporary files
+*.tmp
+*.bak
+*.backup
+*~
+
+# Flask session
+flask_session/
+
+# Coverage reports
+htmlcov/
+.coverage
+.coverage.*
+
+# Jupyter Notebook
+.ipynb_checkpoints
+
+# macOS
+.DS_Store
+.AppleDouble
+.LSOverride
+
+# Windows
+Thumbs.db
+ehthumbs.db
+Desktop.ini
