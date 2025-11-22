@@ -1,0 +1,263 @@
+{% extends "base.html" %}
+
+{% block title %}Report Detail - MediGuard AI{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <div class="mb-3 d-flex justify-content-between">
+        <a href="{{ url_for('reports') }}" class="btn btn-outline-secondary">
+            <i class="fas fa-arrow-left"></i> Back to Reports
+        </a>
+        <div>
+            <a href="{{ url_for('download_report_pdf', report_id=prediction.id) }}" class="btn btn-danger me-2">
+                <i class="fas fa-file-pdf"></i> Download PDF
+            </a>
+            <button onclick="deleteReport({{ prediction.id }})" class="btn btn-outline-danger">
+                <i class="fas fa-trash"></i> Delete Report
+            </button>
+        </div>
+    </div>
+
+    <div class="card shadow-sm">
+        <div class="card-header bg-primary text-white">
+            <h4 class="mb-0"><i class="fas fa-file-medical"></i> Prediction Report</h4>
+        </div>
+        <div class="card-body">
+            <div class="row mb-4">
+                <div class="col-md-3">
+                    <strong>Patient ID:</strong><br>
+                    {{ prediction.patient_id }}
+                </div>
+                <div class="col-md-3">
+                    <strong>Patient Name:</strong><br>
+                    {{ prediction.patient_name or 'N/A' }}
+                </div>
+                <div class="col-md-2">
+                    <strong>Age:</strong><br>
+                    {{ prediction.patient_age or 'N/A' }}
+                </div>
+                <div class="col-md-2">
+                    <strong>Sex:</strong><br>
+                    {{ prediction.patient_sex or 'N/A' }}
+                </div>
+                <div class="col-md-2">
+                    <strong>Date:</strong><br>
+                    {{ prediction.created_at.strftime('%Y-%m-%d') }}
+                </div>
+            </div>
+
+            <div class="row mb-4">
+                <div class="col-md-6">
+                    <strong>Prediction:</strong><br>
+                    <span class="badge bg-primary fs-6">{{ prediction.prediction }}</span>
+                </div>
+                <div class="col-md-6">
+                    <strong>Confidence:</strong><br>
+                    <span class="badge bg-success fs-6">{{ "%.2f"|format(prediction.confidence) }}%</span>
+                </div>
+            </div>
+
+            <hr>
+
+            <h5 class="mb-3">Disease Probabilities</h5>
+            <div class="table-responsive mb-4">
+                <table class="table table-bordered">
+                    <thead>
+                        <tr>
+                            <th>Disease</th>
+                            <th>Probability</th>
+                            <th>Visual</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for disease, prob in prediction.get_probabilities().items() %}
+                        <tr>
+                            <td>{{ disease }}</td>
+                            <td>{{ "%.2f"|format(prob * 100) }}%</td>
+                            <td>
+                                <div class="progress" style="height: 25px;">
+                                    <div class="progress-bar" role="progressbar" style="width: {{ prob * 100 }}%"
+                                        aria-valuenow="{{ prob * 100 }}" aria-valuemin="0" aria-valuemax="100">
+                                        {{ "%.1f"|format(prob * 100) }}%
+                                    </div>
+                                </div>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+
+            <hr>
+
+            <h5 class="mb-3">Input Parameters</h5>
+            <div class="table-responsive mb-4">
+                <table class="table table-striped">
+                    <thead>
+                        <tr>
+                            <th>Parameter</th>
+                            <th>Value</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for param, value in prediction.get_raw_features().items() %}
+                        <tr>
+                            <td>{{ param }}</td>
+                            <td>{{ "%.2f"|format(value) }}</td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+
+            {% if prediction.get_data_quality_issues() or prediction.get_data_quality_warnings() %}
+            <hr>
+            <h5 class="mb-3">Data Quality</h5>
+
+            {% if prediction.get_data_quality_issues() %}
+            <div class="alert alert-danger">
+                <strong>Critical Issues:</strong>
+                <ul>
+                    {% for issue in prediction.get_data_quality_issues() %}
+                    <li>{{ issue.feature }}: {{ "%.2f"|format(issue.value) }} (Expected: {{ issue.expected_range }})
+                    </li>
+                    {% endfor %}
+                </ul>
+            </div>
+            {% endif %}
+
+            {% if prediction.get_data_quality_warnings() %}
+            <div class="alert alert-warning">
+                <strong>Warnings:</strong>
+                <ul>
+                    {% for warning in prediction.get_data_quality_warnings() %}
+                    <li>{{ warning.feature }}: {{ "%.2f"|format(warning.value) }} (Expected: {{ warning.expected_range
+                        }})</li>
+                    {% endfor %}
+                </ul>
+            </div>
+            {% endif %}
+            {% endif %}
+
+            <hr>
+
+            <h5 class="mb-3"><i class="fas fa-chart-bar"></i> SHAP Feature Importance</h5>
+            <div id="shapImportance"></div>
+
+            <hr>
+
+            <h5 class="mb-3">Blockchain Audit Trail</h5>
+            <div class="bg-light p-3 rounded">
+                <p><strong>Block Hash:</strong></p>
+                <code>{{ prediction.block_hash }}</code>
+                <p class="text-muted small mt-2">
+                    <i class="fas fa-info-circle"></i> This hash provides an immutable audit trail
+                    for this prediction.
+                </p>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    // Load SHAP feature importance
+    document.addEventListener('DOMContentLoaded', async function () {
+        try {
+            const response = await fetch('/api/feature_importance');
+            const data = await response.json();
+
+            if (data.features) {
+                displayShapTable(data.features);
+            } else {
+                document.getElementById('shapImportance').innerHTML =
+                    '<div class="alert alert-info"><i class="fas fa-info-circle"></i> SHAP analysis not available. Run analyze_shap_importance.py to generate.</div>';
+            }
+        } catch (error) {
+            console.error('Error loading SHAP data:', error);
+            document.getElementById('shapImportance').innerHTML =
+                '<div class="alert alert-warning"><i class="fas fa-exclamation-triangle"></i> Could not load SHAP analysis.</div>';
+        }
+    });
+
+    function displayShapTable(features) {
+        let html = `
+        <div class="table-responsive">
+            <table class="table table-striped">
+                <thead class="table-primary">
+                    <tr>
+                        <th>Rank</th>
+                        <th>Feature</th>
+                        <th>Importance</th>
+                        <th>Visual</th>
+                    </tr>
+                </thead>
+                <tbody>
+    `;
+
+        const maxImportance = features[0].importance;
+
+        features.forEach((feature, idx) => {
+            const percentage = (feature.importance / maxImportance) * 100;
+            const badgeClass = idx < 3 ? 'bg-danger' : 'bg-primary';
+
+            html += `
+            <tr>
+                <td><span class="badge ${badgeClass}">${idx + 1}</span></td>
+                <td><strong>${feature.name}</strong></td>
+                <td>${feature.importance.toFixed(4)}</td>
+                <td>
+                    <div class="progress" style="height: 20px;">
+                        <div class="progress-bar ${badgeClass}" role="progressbar" 
+                             style="width: ${percentage}%">
+                            ${percentage.toFixed(1)}%
+                        </div>
+                    </div>
+                </td>
+            </tr>
+        `;
+        });
+
+        html += `
+                </tbody>
+            </table>
+        </div>
+        <div class="alert alert-info mt-3">
+            <strong><i class="fas fa-lightbulb"></i> Insight:</strong> 
+            <strong>${features[0].name}</strong> is the most important feature (${features[0].importance.toFixed(4)} importance). 
+            Top 3 features (shown in red) drive most predictions.
+        </div>
+    `;
+
+
+        document.getElementById('shapImportance').innerHTML = html;
+    }
+
+    function deleteReport(reportId) {
+        if (!confirm('Are you sure you want to delete this report? This action cannot be undone.')) {
+            return;
+        }
+
+        fetch(`/report/${reportId}/delete`, {
+            method: 'DELETE',
+            headers: {
+                'Content-Type': 'application/json'
+            }
+        })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    alert('Report deleted successfully');
+                    window.location.href = '/reports';
+                } else {
+                    alert('Error: ' + (data.error || 'Failed to delete report'));
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                alert('Error deleting report');
+            });
+    }
+</script>
+{% endblock %}

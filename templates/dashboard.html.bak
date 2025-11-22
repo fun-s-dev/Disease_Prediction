@@ -1,0 +1,542 @@
+{% extends "base.html" %}
+
+{% block title %}Dashboard - MediGuard AI{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <h2 class="mb-4">
+        <i class="fas fa-chart-line text-primary"></i> Prediction Dashboard
+    </h2>
+
+    <div class="row">
+        <!-- Input Form -->
+        <div class="col-lg-4">
+            <div class="card shadow-sm">
+                <div class="card-header bg-primary text-white">
+                    <h5 class="mb-0"><i class="fas fa-clipboard-list"></i> Patient Data Input</h5>
+                </div>
+                <div class="card-body">
+                    <form id="predictionForm">
+                        <div class="mb-3">
+                            <label for="patient_id" class="form-label">Patient ID</label>
+                            <input type="text" class="form-control" id="patient_id"
+                                value="PAT_{{ current_user.id }}_001" required>
+                            <small class="text-muted">Auto-generated ID based on user and timestamp</small>
+                        </div>
+
+                        <div class="mb-3">
+                            <h6>Blood Test Parameters</h6>
+                            <div class="accordion" id="parametersAccordion">
+                                <!-- Basic Metabolism -->
+                                <div class="accordion-item">
+                                    <h2 class="accordion-header" id="headingMetabolism">
+                                        <button class="accordion-button" type="button" data-bs-toggle="collapse"
+                                            data-bs-target="#collapseMetabolism" aria-expanded="true">
+                                            <i class="fas fa-heartbeat me-2"></i> Basic Metabolism
+                                        </button>
+                                    </h2>
+                                    <div id="collapseMetabolism" class="accordion-collapse collapse show"
+                                        data-bs-parent="#parametersAccordion">
+                                        <div class="accordion-body">
+                                            <div class="row g-2">
+                                                {% for feature in ['Glucose', 'Insulin', 'HbA1c', 'BMI'] %}
+                                                {% if feature in feature_ranges %}
+                                                <div class="col-12">
+                                                    <label for="{{ feature }}" class="form-label small">{{ feature
+                                                        }}</label>
+                                                    <input type="number" class="form-control form-control-sm"
+                                                        id="{{ feature }}" name="{{ feature }}" step="0.1"
+                                                        value="{{ healthy_defaults.get(feature, (feature_ranges[feature][0] + feature_ranges[feature][1]) / 2) }}"
+                                                        data-min="{{ feature_ranges[feature][0] }}"
+                                                        data-max="{{ feature_ranges[feature][1] }}" required>
+                                                    <small class="text-muted">Range: {{
+                                                        "%.2f"|format(feature_ranges[feature][0]) }} - {{
+                                                        "%.2f"|format(feature_ranges[feature][1]) }}</small>
+                                                </div>
+                                                {% endif %}
+                                                {% endfor %}
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <!-- Blood Cell Analysis -->
+                                <div class="accordion-item">
+                                    <h2 class="accordion-header" id="headingBlood">
+                                        <button class="accordion-button collapsed" type="button"
+                                            data-bs-toggle="collapse" data-bs-target="#collapseBlood">
+                                            <i class="fas fa-tint me-2"></i> Blood Cell Analysis
+                                        </button>
+                                    </h2>
+                                    <div id="collapseBlood" class="accordion-collapse collapse"
+                                        data-bs-parent="#parametersAccordion">
+                                        <div class="accordion-body">
+                                            <div class="row g-2">
+                                                {% for feature in ['Hemoglobin', 'Platelets', 'White Blood Cells', 'Red
+                                                Blood Cells', 'Hematocrit', 'Mean Corpuscular Volume', 'Mean Corpuscular
+                                                Hemoglobin', 'Mean Corpuscular Hemoglobin Concentration'] %}
+                                                {% if feature in feature_ranges %}
+                                                <div class="col-12">
+                                                    <label for="{{ feature }}" class="form-label small">{{ feature
+                                                        }}</label>
+                                                    <input type="number" class="form-control form-control-sm"
+                                                        id="{{ feature }}" name="{{ feature }}" step="0.1"
+                                                        value="{{ healthy_defaults.get(feature, (feature_ranges[feature][0] + feature_ranges[feature][1]) / 2) }}"
+                                                        data-min="{{ feature_ranges[feature][0] }}"
+                                                        data-max="{{ feature_ranges[feature][1] }}" required>
+                                                    <small class="text-muted">Range: {{
+                                                        "%.2f"|format(feature_ranges[feature][0]) }} - {{
+                                                        "%.2f"|format(feature_ranges[feature][1]) }}</small>
+                                                </div>
+                                                {% endif %}
+                                                {% endfor %}
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <!-- Cardiac & Lipid Profile -->
+                                <div class="accordion-item">
+                                    <h2 class="accordion-header" id="headingCardiac">
+                                        <button class="accordion-button collapsed" type="button"
+                                            data-bs-toggle="collapse" data-bs-target="#collapseCardiac">
+                                            <i class="fas fa-heart me-2"></i> Cardiac & Lipid Profile
+                                        </button>
+                                    </h2>
+                                    <div id="collapseCardiac" class="accordion-collapse collapse"
+                                        data-bs-parent="#parametersAccordion">
+                                        <div class="accordion-body">
+                                            <div class="row g-2">
+                                                {% for feature in ['Systolic Blood Pressure', 'Diastolic Blood
+                                                Pressure', 'Heart Rate', 'Cholesterol', 'Triglycerides', 'LDL
+                                                Cholesterol', 'HDL Cholesterol', 'Troponin', 'C-reactive Protein'] %}
+                                                {% if feature in feature_ranges %}
+                                                <div class="col-12">
+                                                    <label for="{{ feature }}" class="form-label small">{{ feature
+                                                        }}</label>
+                                                    <input type="number" class="form-control form-control-sm"
+                                                        id="{{ feature }}" name="{{ feature }}" step="0.01"
+                                                        value="{{ healthy_defaults.get(feature, (feature_ranges[feature][0] + feature_ranges[feature][1]) / 2) }}"
+                                                        data-min="{{ feature_ranges[feature][0] }}"
+                                                        data-max="{{ feature_ranges[feature][1] }}" required>
+                                                    <small class="text-muted">Range: {{
+                                                        "%.2f"|format(feature_ranges[feature][0]) }} - {{
+                                                        "%.2f"|format(feature_ranges[feature][1]) }}</small>
+                                                </div>
+                                                {% endif %}
+                                                {% endfor %}
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <!-- Liver & Kidney Function -->
+                                <div class="accordion-item">
+                                    <h2 class="accordion-header" id="headingOrgan">
+                                        <button class="accordion-button collapsed" type="button"
+                                            data-bs-toggle="collapse" data-bs-target="#collapseOrgan">
+                                            <i class="fas fa-kidneys me-2"></i> Liver & Kidney Function
+                                        </button>
+                                    </h2>
+                                    <div id="collapseOrgan" class="accordion-collapse collapse"
+                                        data-bs-parent="#parametersAccordion">
+                                        <div class="accordion-body">
+                                            <div class="row g-2">
+                                                {% for feature in ['ALT', 'AST', 'Creatinine'] %}
+                                                {% if feature in feature_ranges %}
+                                                <div class="col-12">
+                                                    <label for="{{ feature }}" class="form-label small">{{ feature
+                                                        }}</label>
+                                                    <input type="number" class="form-control form-control-sm"
+                                                        id="{{ feature }}" name="{{ feature }}" step="0.1"
+                                                        value="{{ healthy_defaults.get(feature, (feature_ranges[feature][0] + feature_ranges[feature][1]) / 2) }}"
+                                                        data-min="{{ feature_ranges[feature][0] }}"
+                                                        data-max="{{ feature_ranges[feature][1] }}" required>
+                                                    <small class="text-muted">Range: {{
+                                                        "%.2f"|format(feature_ranges[feature][0]) }} - {{
+                                                        "%.2f"|format(feature_ranges[feature][1]) }}</small>
+                                                </div>
+                                                {% endif %}
+                                                {% endfor %}
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <button type="submit" class="btn btn-primary w-100" id="predictBtn">
+                            <i class="fas fa-search"></i> Predict Disease
+                        </button>
+                    </form>
+                </div>
+            </div>
+        </div>
+
+        <!-- Results Area -->
+        <div class="col-lg-8">
+            <div id="resultsArea" style="display: none;">
+                <!-- Data Quality Alerts -->
+                <div id="dataQualityAlerts"></div>
+
+                <!-- Prediction Results -->
+                <div class="card shadow-sm mb-3">
+                    <div class="card-header bg-success text-white">
+                        <h5 class="mb-0"><i class="fas fa-check-circle"></i> Prediction Results</h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="row text-center mb-3">
+                            <div class="col-md-4">
+                                <div class="p-3 bg-light rounded">
+                                    <h6 class="text-muted">Predicted Disease</h6>
+                                    <h4 id="predictionResult" class="text-primary"></h4>
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <div class="p-3 bg-light rounded">
+                                    <h6 class="text-muted">Confidence</h6>
+                                    <h4 id="confidenceResult" class="text-success"></h4>
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <div class="p-3 bg-light rounded">
+                                    <h6 class="text-muted">Risk Level</h6>
+                                    <h4 id="riskLevel" class="text-warning"></h4>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Probability Chart -->
+                        <div id="probabilityChart" class="mb-3"></div>
+
+                        <!-- Feature Importance -->
+                        <div id="featureImportance"></div>
+                    </div>
+                </div>
+
+                <!-- Blockchain Info -->
+                <div class="card shadow-sm">
+                    <div class="card-header bg-info text-white">
+                        <h5 class="mb-0"><i class="fas fa-link"></i> Blockchain Audit Trail</h5>
+                    </div>
+                    <div class="card-body">
+                        <p><strong>Block Hash:</strong> <code id="blockHash"></code></p>
+                        <p class="text-muted small">
+                            <i class="fas fa-info-circle"></i> This prediction has been logged to the blockchain
+                            for immutable audit trail.
+                        </p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Welcome Message -->
+            <div id="welcomeMessage" class="card shadow-sm">
+                <div class="card-body text-center py-5">
+                    <i class="fas fa-clipboard-list fa-4x text-muted mb-3"></i>
+                    <h4>Ready to Predict</h4>
+                    <p class="text-muted">Enter patient data in the form and click "Predict Disease" to get started.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    // Generate patient ID with timestamp
+    function generatePatientId() {
+        const now = new Date();
+        const timestamp = now.getFullYear().toString() +
+            String(now.getMonth() + 1).padStart(2, '0') +
+            String(now.getDate()).padStart(2, '0') +
+            String(now.getHours()).padStart(2, '0') +
+            String(now.getMinutes()).padStart(2, '0') +
+            String(now.getSeconds()).padStart(2, '0');
+        return `PAT_{{ current_user.id }}_${timestamp}`;
+    }
+
+    // Set default patient ID on page load
+    document.addEventListener('DOMContentLoaded', function () {
+        const patientIdInput = document.getElementById('patient_id');
+        if (patientIdInput && !patientIdInput.value) {
+            patientIdInput.value = generatePatientId();
+        }
+    });
+
+    document.getElementById('predictionForm').addEventListener('submit', async function (e) {
+        e.preventDefault();
+
+        const formData = new FormData(this);
+        const data = {};
+        let patientId = document.getElementById('patient_id').value;
+        if (!patientId || patientId === 'PAT_{{ current_user.id }}_001') {
+            patientId = generatePatientId();
+            document.getElementById('patient_id').value = patientId;
+        }
+        data.patient_id = patientId;
+
+        // Collect all feature inputs dynamically
+        const inputs = this.querySelectorAll('input[type="number"][name]');
+        inputs.forEach(input => {
+            if (input.name && input.name !== 'patient_id') {
+                data[input.name] = parseFloat(input.value);
+            }
+        });
+
+        const predictBtn = document.getElementById('predictBtn');
+        const originalText = predictBtn.innerHTML;
+        predictBtn.disabled = true;
+        predictBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Predicting...';
+
+        try {
+            const response = await fetch('/predict', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify(data)
+            });
+
+            const result = await response.json();
+
+            if (result.success) {
+                displayResults(result);
+            } else {
+                alert('Error: ' + (result.error || 'Unknown error'));
+            }
+        } catch (error) {
+            alert('Error: ' + error.message);
+        } finally {
+            predictBtn.disabled = false;
+            predictBtn.innerHTML = originalText;
+        }
+    });
+
+    function displayResults(result) {
+        // Hide welcome message, show results
+        document.getElementById('welcomeMessage').style.display = 'none';
+        document.getElementById('resultsArea').style.display = 'block';
+
+        // Display prediction
+        document.getElementById('predictionResult').textContent = result.prediction;
+        document.getElementById('confidenceResult').textContent = result.confidence.toFixed(2) + '%';
+
+        // Risk level - use the risk_level from server response
+        // Server calculates: Healthy = LOW, Diseases = HIGH/MEDIUM based on confidence
+        const riskLevel = result.risk_level || (result.prediction === 'Healthy' ? 'LOW' : 'MEDIUM');
+        const riskColor = riskLevel === 'HIGH' ? 'danger' : riskLevel === 'MEDIUM' ? 'warning' : 'success';
+        document.getElementById('riskLevel').innerHTML =
+            `<span class="text-${riskColor}">${riskLevel}</span>`;
+
+        // Data quality alerts
+        const alertsDiv = document.getElementById('dataQualityAlerts');
+        alertsDiv.innerHTML = '';
+
+        if (result.data_quality.issues.length > 0) {
+            let issuesHtml = '<div class="alert alert-danger"><strong>Critical Data Quality Issues:</strong><ul>';
+            result.data_quality.issues.forEach(issue => {
+                issuesHtml += `<li>${issue.feature}: ${issue.value.toFixed(2)} (Expected: ${issue.expected_range})</li>`;
+            });
+            issuesHtml += '</ul></div>';
+            alertsDiv.innerHTML += issuesHtml;
+        }
+
+        if (result.data_quality.warnings.length > 0) {
+            let warningsHtml = '<div class="alert alert-warning"><strong>Data Quality Warnings:</strong><ul>';
+            result.data_quality.warnings.forEach(warning => {
+                warningsHtml += `<li>${warning.feature}: ${warning.value.toFixed(2)} (Expected: ${warning.expected_range})</li>`;
+            });
+            warningsHtml += '</ul></div>';
+            alertsDiv.innerHTML += warningsHtml;
+        }
+
+        // Probability chart
+        const probData = Object.entries(result.probabilities).map(([disease, prob]) => ({
+            x: disease,
+            y: (prob * 100).toFixed(2)
+        }));
+
+        const probTrace = {
+            x: probData.map(d => d.x),
+            y: probData.map(d => parseFloat(d.y)),
+            type: 'bar',
+            marker: { color: 'rgb(13, 110, 253)' }
+        };
+
+        Plotly.newPlot('probabilityChart', [probTrace], {
+            title: 'Disease Probability Distribution',
+            xaxis: { title: 'Disease' },
+            yaxis: { title: 'Probability (%)' },
+            height: 300
+        });
+
+        // Fetch and display SHAP feature importance
+        fetchFeatureImportance();
+
+        // Block hash
+        document.getElementById('blockHash').textContent = result.block_hash;
+
+        // Scroll to results
+        document.getElementById('resultsArea').scrollIntoView({ behavior: 'smooth' });
+    }
+
+    async function fetchFeatureImportance() {
+        try {
+            const response = await fetch('/api/feature_importance');
+            const data = await response.json();
+
+            if (data.features) {
+                displayFeatureImportance(data.features);
+            }
+        } catch (error) {
+            console.error('Error fetching feature importance:', error);
+            document.getElementById('featureImportance').innerHTML =
+                '<div class="alert alert-info"><i class="fas fa-info-circle"></i> Feature importance analysis not available. Run analyze_shap_importance.py to generate.</div>';
+        }
+    }
+
+    function displayFeatureImportance(features) {
+        const importanceDiv = document.getElementById('featureImportance');
+
+        // Create header
+        let html = `
+        <div class="mt-4">
+            <h6><i class="fas fa-chart-bar"></i> Top 10 Most Important Features (SHAP Analysis)</h6>
+            <p class="text-muted small">These features have the strongest influence on the model's predictions</p>
+    `;
+
+        // Create horizontal bar chart data (features are already sorted, don't reverse!)
+        const featureNames = features.map(f => f.name);
+        const importanceValues = features.map(f => f.importance);
+
+        // Color code: top 3 in red, rest in blue
+        const colors = importanceValues.map((val, idx) =>
+            idx < 3 ? 'rgb(220, 53, 69)' : 'rgb(13, 110, 253)'
+        );
+
+        // Reverse for horizontal bar chart (highest at top)
+        const trace = {
+            y: featureNames.slice().reverse(),
+            x: importanceValues.slice().reverse(),
+            type: 'bar',
+            orientation: 'h',
+            marker: { color: colors.slice().reverse() },
+            text: importanceValues.slice().reverse().map(v => v.toFixed(4)),
+            textposition: 'auto'
+        };
+
+        html += '<div id="featureImportanceChart"></div>';
+
+        // Get current prediction result for personalized suggestions
+        const prediction = document.getElementById('predictionResult').textContent;
+
+        // Generate health suggestions based on prediction and top features
+        let suggestions = generateHealthSuggestions(prediction, features.slice(0, 3));
+
+        html += `
+        <div class="alert alert-info mt-3">
+            <strong><i class="fas fa-lightbulb"></i> Key Insights:</strong>
+            <ul class="mb-0 mt-2">
+                <li><strong>${features[0].name}</strong> is the most important feature (${(features[0].importance).toFixed(4)} importance)</li>
+                <li>Top 3 features (shown in red) drive most predictions</li>
+                <li>Ensure accurate measurement of these critical parameters</li>
+            </ul>
+        </div>
+    `;
+
+        if (suggestions.length > 0) {
+            html += `
+            <div class="alert alert-success mt-3">
+                <strong><i class="fas fa-heart"></i> Personalized Health Suggestions:</strong>
+                <ul class="mb-0 mt-2">
+                    ${suggestions.map(s => `<li>${s}</li>`).join('')}
+                </ul>
+            </div>
+        `;
+        }
+
+        html += '</div>';
+
+        importanceDiv.innerHTML = html;
+
+        // Plot the chart
+        Plotly.newPlot('featureImportanceChart', [trace], {
+            title: 'SHAP Feature Importance',
+            xaxis: { title: 'Mean Absolute SHAP Value' },
+            yaxis: { title: '' },
+            height: 400,
+            margin: { l: 200 }
+        });
+    }
+
+    function generateHealthSuggestions(prediction, topFeatures) {
+        const suggestions = [];
+
+        // General healthy lifestyle tips
+        if (prediction === 'Healthy') {
+            suggestions.push('✅ <strong>Great job!</strong> Maintain your current healthy lifestyle');
+            suggestions.push('Continue regular exercise (150 minutes/week of moderate activity)');
+            suggestions.push('Maintain a balanced diet rich in fruits, vegetables, and whole grains');
+            suggestions.push('Get 7-9 hours of quality sleep each night');
+            suggestions.push('Schedule annual health check-ups to monitor key parameters');
+        }
+
+        // Disease-specific suggestions
+        if (prediction === 'Diabetes') {
+            suggestions.push('🩺 <strong>Consult an endocrinologist</strong> for diabetes management');
+            suggestions.push('Monitor blood glucose levels regularly (target: 80-130 mg/dL fasting)');
+            suggestions.push('Reduce refined carbohydrates and sugar intake');
+            suggestions.push('Increase physical activity to improve insulin sensitivity');
+            suggestions.push('Consider HbA1c testing every 3 months (target: <7%)');
+        }
+
+        if (prediction === 'Heart Di') {
+            suggestions.push('❤️ <strong>Urgent:</strong> Consult a cardiologist immediately');
+            suggestions.push('Monitor blood pressure daily (target: <120/80 mmHg)');
+            suggestions.push('Reduce sodium intake (<2,300 mg/day)');
+            suggestions.push('Quit smoking and limit alcohol consumption');
+            suggestions.push('Consider cardiac stress test and ECG');
+        }
+
+        if (prediction === 'Anemia') {
+            suggestions.push('🩸 <strong>Consult a hematologist</strong> for anemia treatment');
+            suggestions.push('Increase iron-rich foods (red meat, spinach, lentils)');
+            suggestions.push('Take vitamin C with iron to improve absorption');
+            suggestions.push('Get complete blood count (CBC) test every 3 months');
+            suggestions.push('Consider iron supplements if prescribed by doctor');
+        }
+
+        if (prediction === 'Thalasse') {
+            suggestions.push('🧬 <strong>Genetic counseling recommended</strong> for thalassemia');
+            suggestions.push('Regular blood transfusions if prescribed');
+            suggestions.push('Monitor iron levels (avoid iron overload)');
+            suggestions.push('Folic acid supplementation as recommended');
+            suggestions.push('Join thalassemia support groups for guidance');
+        }
+
+        if (prediction === 'Thromboc') {
+            suggestions.push('🩸 <strong>Consult a hematologist</strong> for platelet disorder');
+            suggestions.push('Avoid medications that affect platelet function (aspirin, NSAIDs)');
+            suggestions.push('Monitor platelet count regularly');
+            suggestions.push('Stay hydrated and maintain good nutrition');
+            suggestions.push('Report any unusual bleeding or bruising immediately');
+        }
+
+        // Feature-specific suggestions based on top 3 important features
+        topFeatures.forEach(feature => {
+            if (feature.name === 'BMI' && prediction !== 'Healthy') {
+                suggestions.push('⚖️ Focus on achieving healthy BMI (18.5-24.9) through diet and exercise');
+            }
+            if (feature.name === 'Insulin' && prediction !== 'Healthy') {
+                suggestions.push('🍽️ Practice portion control and eat smaller, frequent meals');
+            }
+            if (feature.name === 'HbA1c' && prediction !== 'Healthy') {
+                suggestions.push('📊 Monitor HbA1c levels quarterly (target: <5.7% for non-diabetics)');
+            }
+        });
+
+        return suggestions;
+    }
+</script>
+{% endblock %}

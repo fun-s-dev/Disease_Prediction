@@ -1,0 +1,797 @@
+{% extends "base.html" %}
+
+{% block title %}MediGuard AI - Intelligent Medical Triage{% endblock %}
+
+{% block content %}
+<!-- Hero Section -->
+<section class="hero-section">
+    <div class="hero-background"></div>
+    <div class="container">
+        <div class="row align-items-center min-vh-100">
+            <div class="col-lg-6 hero-content">
+                <div class="brand-logo mb-4">
+                    <i class="fas fa-hospital-user"></i>
+                    <span class="brand-text">MediGuard AI</span>
+                </div>
+                <h1 class="hero-title mb-3">
+                    Intelligent Multi-Disease Prediction
+                </h1>
+                <p class="hero-subtitle mb-4">
+                    AI-powered analysis of 24 blood parameters for accurate disease detection
+                </p>
+                <div class="hero-stats mb-4">
+                    <div class="stat-item">
+                        <div class="stat-number">93%</div>
+                        <div class="stat-label">Accuracy</div>
+                    </div>
+                    <div class="stat-item">
+                        <div class="stat-number">5</div>
+                        <div class="stat-label">Diseases</div>
+                    </div>
+                    <div class="stat-item">
+                        <div class="stat-number">24</div>
+                        <div class="stat-label">Parameters</div>
+                    </div>
+                </div>
+                <div class="hero-buttons">
+                    {% if current_user.is_authenticated %}
+                    <a href="{{ url_for('dashboard') }}" class="btn btn-primary btn-lg btn-animated">
+                        <i class="fas fa-chart-line"></i> Dashboard
+                        <span class="btn-shine"></span>
+                    </a>
+                    <a href="{{ url_for('analytics') }}" class="btn btn-outline-light btn-lg btn-animated">
+                        <i class="fas fa-chart-bar"></i> Analytics
+                    </a>
+                    {% else %}
+                    <a href="{{ url_for('register') }}" class="btn btn-primary btn-lg btn-animated">
+                        <i class="fas fa-user-plus"></i> Get Started
+                        <span class="btn-shine"></span>
+                    </a>
+                    <a href="{{ url_for('login') }}" class="btn btn-outline-light btn-lg btn-animated">
+                        <i class="fas fa-sign-in-alt"></i> Login
+                    </a>
+                    {% endif %}
+                </div>
+            </div>
+            <div class="col-lg-6">
+                <div class="hero-visual">
+                    <div class="floating-card card-1">
+                        <i class="fas fa-heartbeat"></i>
+                        <span>Heart Disease</span>
+                    </div>
+                    <div class="floating-card card-2">
+                        <i class="fas fa-tint"></i>
+                        <span>Diabetes</span>
+                    </div>
+                    <div class="floating-card card-3">
+                        <i class="fas fa-dna"></i>
+                        <span>Anemia</span>
+                    </div>
+                    <div class="floating-card card-4">
+                        <i class="fas fa-virus"></i>
+                        <span>Thalassemia</span>
+                    </div>
+                    <div class="central-pulse">
+                        <div class="pulse-ring"></div>
+                        <div class="pulse-ring"></div>
+                        <div class="pulse-ring"></div>
+                        <i class="fas fa-brain"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="scroll-indicator">
+        <i class="fas fa-chevron-down"></i>
+    </div>
+</section>
+
+<!-- Features Section -->
+<section class="features-section">
+    <div class="container">
+        <div class="section-header">
+            <h2 class="section-title">Powerful Features</h2>
+            <p class="section-subtitle">Everything you need for intelligent medical triage</p>
+        </div>
+        <div class="row g-4">
+            <div class="col-md-4" data-aos="fade-up" data-aos-delay="0">
+                <div class="feature-card">
+                    <div class="feature-icon">
+                        <i class="fas fa-brain"></i>
+                    </div>
+                    <h5>AI-Powered Analysis</h5>
+                    <p>Advanced XGBoost ensemble with SHAP explainability</p>
+                </div>
+            </div>
+            <div class="col-md-4" data-aos="fade-up" data-aos-delay="100">
+                <div class="feature-card">
+                    <div class="feature-icon">
+                        <i class="fas fa-shield-alt"></i>
+                    </div>
+                    <h5>Safety First</h5>
+                    <p>Anomaly detection and data quality validation</p>
+                </div>
+            </div>
+            <div class="col-md-4" data-aos="fade-up" data-aos-delay="200">
+                <div class="feature-card">
+                    <div class="feature-icon">
+                        <i class="fas fa-chart-line"></i>
+                    </div>
+                    <h5>Real-Time Insights</h5>
+                    <p>Color-coded validation and comprehensive analytics</p>
+                </div>
+            </div>
+            <div class="col-md-4" data-aos="fade-up" data-aos-delay="300">
+                <div class="feature-card">
+                    <div class="feature-icon">
+                        <i class="fas fa-link"></i>
+                    </div>
+                    <h5>Blockchain Audit</h5>
+                    <p>Immutable logging for compliance and security</p>
+                </div>
+            </div>
+            <div class="col-md-4" data-aos="fade-up" data-aos-delay="400">
+                <div class="feature-card">
+                    <div class="feature-icon">
+                        <i class="fas fa-file-pdf"></i>
+                    </div>
+                    <h5>PDF Reports</h5>
+                    <p>Downloadable reports with patient demographics</p>
+                </div>
+            </div>
+            <div class="col-md-4" data-aos="fade-up" data-aos-delay="500">
+                <div class="feature-card">
+                    <div class="feature-icon">
+                        <i class="fas fa-search"></i>
+                    </div>
+                    <h5>Advanced Search</h5>
+                    <p>Filter by patient, disease, date, and confidence</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- How It Works -->
+<section class="how-it-works">
+    <div class="container">
+        <div class="section-header">
+            <h2 class="section-title">How It Works</h2>
+            <p class="section-subtitle">Four simple steps to intelligent disease prediction</p>
+        </div>
+        <div class="timeline">
+            <div class="timeline-item" data-aos="fade-right">
+                <div class="timeline-number">1</div>
+                <div class="timeline-content">
+                    <h5>Enter Patient Data</h5>
+                    <p>Input demographics and 24 blood test parameters with real-time validation</p>
+                </div>
+            </div>
+            <div class="timeline-item" data-aos="fade-left">
+                <div class="timeline-number">2</div>
+                <div class="timeline-content">
+                    <h5>AI Analysis</h5>
+                    <p>Model analyzes patterns, detects anomalies, and calculates predictions</p>
+                </div>
+            </div>
+            <div class="timeline-item" data-aos="fade-right">
+                <div class="timeline-number">3</div>
+                <div class="timeline-content">
+                    <h5>Get Results</h5>
+                    <p>Receive prediction with confidence score and risk level assessment</p>
+                </div>
+            </div>
+            <div class="timeline-item" data-aos="fade-left">
+                <div class="timeline-number">4</div>
+                <div class="timeline-content">
+                    <h5>Review Insights</h5>
+                    <p>View SHAP analysis, health recommendations, and download PDF report</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- CTA Section -->
+<section class="cta-section">
+    <div class="container text-center">
+        <div class="cta-content" data-aos="zoom-in">
+            <h2>Ready to Transform Medical Triage?</h2>
+            <p>Join healthcare professionals using MediGuard AI for intelligent disease prediction</p>
+            {% if not current_user.is_authenticated %}
+            <a href="{{ url_for('register') }}" class="btn btn-light btn-lg btn-animated">
+                <i class="fas fa-user-plus"></i> Create Free Account
+                <span class="btn-shine"></span>
+            </a>
+            {% endif %}
+        </div>
+    </div>
+</section>
+{% endblock %}
+
+{% block extra_css %}
+<link href="https://unpkg.com/aos@2.3.1/dist/aos.css" rel="stylesheet">
+<style>
+    /* Hero Section */
+    .hero-section {
+        position: relative;
+        background: linear-gradient(135deg, #1a1a1a 0%, #2d2d2d 50%, #1a1a1a 100%);
+        color: white;
+        overflow: hidden;
+    }
+
+    .hero-background {
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background:
+            radial-gradient(circle at 20% 50%, rgba(255, 255, 255, 0.1) 0%, transparent 50%),
+            radial-gradient(circle at 80% 80%, rgba(255, 255, 255, 0.1) 0%, transparent 50%);
+        animation: backgroundShift 20s ease-in-out infinite;
+    }
+
+    @keyframes backgroundShift {
+
+        0%,
+        100% {
+            transform: scale(1) rotate(0deg);
+        }
+
+        50% {
+            transform: scale(1.1) rotate(5deg);
+        }
+    }
+
+    .brand-logo {
+        display: flex;
+        align-items: center;
+        gap: 15px;
+        animation: slideInLeft 0.8s ease-out;
+    }
+
+    .brand-logo i {
+        font-size: 3rem;
+        color: #fff;
+        filter: drop-shadow(0 4px 8px rgba(0, 0, 0, 0.3));
+    }
+
+    .brand-text {
+        font-size: 2rem;
+        font-weight: 800;
+        color: #fff;
+        text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
+    }
+
+    .hero-content {
+        animation: fadeInUp 1s ease-out;
+    }
+
+    .hero-title {
+        font-size: 3rem;
+        font-weight: 800;
+        line-height: 1.2;
+        margin-bottom: 1.5rem;
+        animation: slideInLeft 0.8s ease-out 0.2s both;
+    }
+
+    .hero-subtitle {
+        font-size: 1.25rem;
+        opacity: 0.95;
+        animation: slideInLeft 0.8s ease-out 0.4s both;
+    }
+
+    .hero-stats {
+        display: flex;
+        gap: 2rem;
+        animation: slideInLeft 0.8s ease-out 0.6s both;
+    }
+
+    .stat-item {
+        text-align: center;
+    }
+
+    .stat-number {
+        font-size: 2.5rem;
+        font-weight: 800;
+        color: #fff;
+        text-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+    }
+
+    .stat-label {
+        font-size: 0.9rem;
+        opacity: 0.9;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+    }
+
+    .hero-buttons {
+        display: flex;
+        gap: 1rem;
+        flex-wrap: wrap;
+        animation: slideInLeft 0.8s ease-out 0.8s both;
+    }
+
+    .btn-animated {
+        position: relative;
+        overflow: hidden;
+        transition: all 0.3s ease;
+    }
+
+    .btn-animated:hover {
+        transform: translateY(-3px);
+        box-shadow: 0 10px 25px rgba(0, 0, 0, 0.3);
+    }
+
+    .btn-shine {
+        position: absolute;
+        top: 0;
+        left: -100%;
+        width: 100%;
+        height: 100%;
+        background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.3), transparent);
+        transition: left 0.5s;
+    }
+
+    .btn-animated:hover .btn-shine {
+        left: 100%;
+    }
+
+    .btn-outline-light {
+        border: 2px solid rgba(255, 255, 255, 0.8);
+        color: white;
+    }
+
+    .btn-outline-light:hover {
+        background: rgba(255, 255, 255, 0.2);
+        border-color: white;
+        color: white;
+    }
+
+    /* Hero Visual */
+    .hero-visual {
+        position: relative;
+        height: 500px;
+        animation: fadeIn 1s ease-out 0.5s both;
+    }
+
+    .floating-card {
+        position: absolute;
+        background: rgba(255, 255, 255, 0.15);
+        backdrop-filter: blur(10px);
+        border: 1px solid rgba(255, 255, 255, 0.3);
+        border-radius: 15px;
+        padding: 1.5rem;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 0.5rem;
+        box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+        animation: float 3s ease-in-out infinite;
+    }
+
+    .floating-card i {
+        font-size: 2rem;
+        color: #fff;
+    }
+
+    .floating-card span {
+        font-size: 0.9rem;
+        font-weight: 600;
+        color: #fff;
+    }
+
+    .card-1 {
+        top: 10%;
+        left: 10%;
+        animation-delay: 0s;
+    }
+
+    .card-2 {
+        top: 15%;
+        right: 15%;
+        animation-delay: 0.5s;
+    }
+
+    .card-3 {
+        bottom: 25%;
+        left: 5%;
+        animation-delay: 1s;
+    }
+
+    .card-4 {
+        bottom: 20%;
+        right: 10%;
+        animation-delay: 1.5s;
+    }
+
+    @keyframes float {
+
+        0%,
+        100% {
+            transform: translateY(0px);
+        }
+
+        50% {
+            transform: translateY(-20px);
+        }
+    }
+
+    .central-pulse {
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        width: 150px;
+        height: 150px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+
+    .central-pulse i {
+        font-size: 4rem;
+        color: #fff;
+        z-index: 2;
+        animation: pulse 2s ease-in-out infinite;
+    }
+
+    .pulse-ring {
+        position: absolute;
+        width: 100%;
+        height: 100%;
+        border: 3px solid rgba(255, 255, 255, 0.5);
+        border-radius: 50%;
+        animation: pulsate 2s ease-out infinite;
+    }
+
+    .pulse-ring:nth-child(2) {
+        animation-delay: 0.5s;
+    }
+
+    .pulse-ring:nth-child(3) {
+        animation-delay: 1s;
+    }
+
+    @keyframes pulsate {
+        0% {
+            transform: scale(0.5);
+            opacity: 1;
+        }
+
+        100% {
+            transform: scale(1.5);
+            opacity: 0;
+        }
+    }
+
+    @keyframes pulse {
+
+        0%,
+        100% {
+            transform: scale(1);
+        }
+
+        50% {
+            transform: scale(1.1);
+        }
+    }
+
+    .scroll-indicator {
+        position: absolute;
+        bottom: 30px;
+        left: 50%;
+        transform: translateX(-50%);
+        animation: bounce 2s infinite;
+    }
+
+    .scroll-indicator i {
+        font-size: 2rem;
+        color: rgba(255, 255, 255, 0.7);
+    }
+
+    @keyframes bounce {
+
+        0%,
+        20%,
+        50%,
+        80%,
+        100% {
+            transform: translateX(-50%) translateY(0);
+        }
+
+        40% {
+            transform: translateX(-50%) translateY(-10px);
+        }
+
+        60% {
+            transform: translateX(-50%) translateY(-5px);
+        }
+    }
+
+    /* Features Section */
+    .features-section {
+        padding: 100px 0;
+        background: #f8f9fa;
+    }
+
+    .section-header {
+        text-align: center;
+        margin-bottom: 60px;
+    }
+
+    .section-title {
+        font-size: 2.5rem;
+        font-weight: 800;
+        color: #2d3748;
+        margin-bottom: 1rem;
+    }
+
+    .section-subtitle {
+        font-size: 1.1rem;
+        color: #718096;
+    }
+
+    .feature-card {
+        background: white;
+        border-radius: 20px;
+        padding: 2.5rem;
+        text-align: center;
+        transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.07);
+        height: 100%;
+    }
+
+    .feature-card:hover {
+        transform: translateY(-15px) scale(1.02);
+        box-shadow: 0 20px 40px rgba(102, 126, 234, 0.3);
+    }
+
+    .feature-icon {
+        width: 80px;
+        height: 80px;
+        margin: 0 auto 1.5rem;
+        background: linear-gradient(135deg, #4a4a4a 0%, #2d2d2d 100%);
+        border-radius: 20px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        transition: all 0.3s ease;
+    }
+
+    .feature-card:hover .feature-icon {
+        transform: rotateY(360deg);
+    }
+
+    .feature-icon i {
+        font-size: 2rem;
+        color: white;
+    }
+
+    .feature-card h5 {
+        font-size: 1.25rem;
+        font-weight: 700;
+        color: #2d3748;
+        margin-bottom: 1rem;
+    }
+
+    .feature-card p {
+        color: #718096;
+        line-height: 1.6;
+    }
+
+    /* How It Works */
+    .how-it-works {
+        padding: 100px 0;
+        background: white;
+    }
+
+    .timeline {
+        max-width: 800px;
+        margin: 0 auto;
+        position: relative;
+    }
+
+    .timeline::before {
+        content: '';
+        position: absolute;
+        left: 50%;
+        top: 0;
+        bottom: 0;
+        width: 2px;
+        background: linear-gradient(180deg, #4a4a4a 0%, #2d2d2d 100%);
+    }
+
+    .timeline-item {
+        display: flex;
+        align-items: center;
+        margin-bottom: 4rem;
+        position: relative;
+    }
+
+    .timeline-item:nth-child(even) {
+        flex-direction: row-reverse;
+    }
+
+    .timeline-number {
+        width: 60px;
+        height: 60px;
+        background: linear-gradient(135deg, #4a4a4a 0%, #2d2d2d 100%);
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 1.5rem;
+        font-weight: 800;
+        color: white;
+        box-shadow: 0 4px 15px rgba(102, 126, 234, 0.4);
+        z-index: 2;
+        position: absolute;
+        left: 50%;
+        transform: translateX(-50%);
+    }
+
+    .timeline-content {
+        width: 45%;
+        background: white;
+        padding: 2rem;
+        border-radius: 15px;
+        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+        transition: all 0.3s ease;
+    }
+
+    .timeline-item:nth-child(odd) .timeline-content {
+        margin-right: auto;
+    }
+
+    .timeline-item:nth-child(even) .timeline-content {
+        margin-left: auto;
+    }
+
+    .timeline-content:hover {
+        transform: scale(1.05);
+        box-shadow: 0 8px 30px rgba(102, 126, 234, 0.2);
+    }
+
+    .timeline-content h5 {
+        font-size: 1.25rem;
+        font-weight: 700;
+        color: #2d3748;
+        margin-bottom: 0.5rem;
+    }
+
+    .timeline-content p {
+        color: #718096;
+        margin: 0;
+    }
+
+    /* CTA Section */
+    .cta-section {
+        padding: 100px 0;
+        background: linear-gradient(135deg, #4a4a4a 0%, #2d2d2d 100%);
+        color: white;
+    }
+
+    .cta-content h2 {
+        font-size: 2.5rem;
+        font-weight: 800;
+        margin-bottom: 1rem;
+    }
+
+    .cta-content p {
+        font-size: 1.25rem;
+        margin-bottom: 2rem;
+        opacity: 0.95;
+    }
+
+    /* Animations */
+    @keyframes slideInLeft {
+        from {
+            opacity: 0;
+            transform: translateX(-50px);
+        }
+
+        to {
+            opacity: 1;
+            transform: translateX(0);
+        }
+    }
+
+    @keyframes fadeInUp {
+        from {
+            opacity: 0;
+            transform: translateY(30px);
+        }
+
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+
+    @keyframes fadeIn {
+        from {
+            opacity: 0;
+        }
+
+        to {
+            opacity: 1;
+        }
+    }
+
+    /* Responsive */
+    @media (max-width: 992px) {
+        .hero-title {
+            font-size: 2.5rem;
+        }
+
+        .hero-visual {
+            height: 400px;
+        }
+
+        .timeline::before {
+            left: 30px;
+        }
+
+        .timeline-number {
+            left: 30px;
+            transform: translateX(0);
+        }
+
+        .timeline-item {
+            flex-direction: column !important;
+            align-items: flex-start;
+        }
+
+        .timeline-content {
+            width: calc(100% - 100px);
+            margin-left: 100px !important;
+        }
+    }
+
+    @media (max-width: 768px) {
+        .hero-title {
+            font-size: 2rem;
+        }
+
+        .hero-stats {
+            flex-direction: column;
+            gap: 1rem;
+        }
+
+        .stat-item {
+            text-align: left;
+        }
+
+        .hero-visual {
+            height: 300px;
+        }
+
+        .floating-card {
+            padding: 1rem;
+        }
+
+        .central-pulse {
+            width: 100px;
+            height: 100px;
+        }
+
+        .central-pulse i {
+            font-size: 2.5rem;
+        }
+    }
+</style>
+{% endblock %}
+
+{% block extra_js %}
+<script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
+<script>
+    AOS.init({
+        duration: 800,
+        easing: 'ease-out-cubic',
+        once: true,
+        offset: 100
+    });
+</script>
+{% endblock %}

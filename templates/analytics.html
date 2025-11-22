@@ -1,0 +1,187 @@
+{% extends "base.html" %}
+
+{% block title %}Analytics - MediGuard AI{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <h2 class="mb-4"><i class="fas fa-chart-line text-dark"></i> Analytics Dashboard</h2>
+
+    <!-- Statistics Cards -->
+    <div class="row mb-4">
+        <div class="col-md-3">
+            <div class="card text-center shadow-sm">
+                <div class="card-body">
+                    <i class="fas fa-file-medical fa-3x text-dark mb-2"></i>
+                    <h3 class="mb-0">{{ total_predictions }}</h3>
+                    <p class="text-muted mb-0">Total Predictions</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card text-center shadow-sm">
+                <div class="card-body">
+                    <i class="fas fa-calendar-week fa-3x text-success mb-2"></i>
+                    <h3 class="mb-0">{{ recent_count }}</h3>
+                    <p class="text-muted mb-0">Last 7 Days</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card text-center shadow-sm">
+                <div class="card-body">
+                    <i class="fas fa-disease fa-3x text-warning mb-2"></i>
+                    <h3 class="mb-0">{{ disease_counts|length }}</h3>
+                    <p class="text-muted mb-0">Disease Types</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card text-center shadow-sm">
+                <div class="card-body">
+                    <i class="fas fa-percentage fa-3x text-info mb-2"></i>
+                    <h3 class="mb-0">{{ disease_confidence.values()|list|sum / disease_confidence|length if
+                        disease_confidence else 0|round(1) }}%</h3>
+                    <p class="text-muted mb-0">Avg Confidence</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Charts Row -->
+    <div class="row">
+        <!-- Disease Distribution -->
+        <div class="col-md-6 mb-4">
+            <div class="card shadow-sm">
+                <div class="card-header bg-dark text-white">
+                    <h5 class="mb-0"><i class="fas fa-chart-pie"></i> Disease Distribution</h5>
+                </div>
+                <div class="card-body">
+                    <canvas id="diseaseChart"></canvas>
+                </div>
+            </div>
+        </div>
+
+        <!-- Predictions Trend -->
+        <div class="col-md-6 mb-4">
+            <div class="card shadow-sm">
+                <div class="card-header bg-success text-white">
+                    <h5 class="mb-0"><i class="fas fa-chart-line"></i> Predictions Trend (7 Days)</h5>
+                </div>
+                <div class="card-body">
+                    <canvas id="trendChart"></canvas>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Confidence by Disease -->
+    <div class="row">
+        <div class="col-12">
+            <div class="card shadow-sm">
+                <div class="card-header bg-info text-white">
+                    <h5 class="mb-0"><i class="fas fa-chart-bar"></i> Average Confidence by Disease</h5>
+                </div>
+                <div class="card-body">
+                    <canvas id="confidenceChart"></canvas>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js@3.9.1/dist/chart.min.js"></script>
+<script>
+    // Disease Distribution Pie Chart
+    const diseaseData = {{ disease_counts| tojson }};
+    const diseaseLabels = Object.keys(diseaseData);
+    const diseaseCounts = Object.values(diseaseData);
+
+    new Chart(document.getElementById('diseaseChart'), {
+        type: 'doughnut',
+        data: {
+            labels: diseaseLabels,
+            datasets: [{
+                data: diseaseCounts,
+                backgroundColor: [
+                    '#4a4a4a', '#28a745', '#ffc107', '#dc3545', '#6c757d', '#17a2b8'
+                ]
+            }]
+        },
+        options: {
+            responsive: true,
+            plugins: {
+                legend: {
+                    position: 'bottom'
+                }
+            }
+        }
+    });
+
+    // Predictions Trend Line Chart
+    const dailyData = {{ daily_counts| tojson }};
+    const dates = Object.keys(dailyData).reverse();
+    const counts = Object.values(dailyData).reverse();
+
+    new Chart(document.getElementById('trendChart'), {
+        type: 'line',
+        data: {
+            labels: dates,
+            datasets: [{
+                label: 'Predictions',
+                data: counts,
+                borderColor: '#28a745',
+                backgroundColor: 'rgba(40, 167, 69, 0.1)',
+                tension: 0.4,
+                fill: true
+            }]
+        },
+        options: {
+            responsive: true,
+            plugins: {
+                legend: {
+                    display: false
+                }
+            },
+            scales: {
+                y: {
+                    beginAtZero: true,
+                    ticks: {
+                        stepSize: 1
+                    }
+                }
+            }
+        }
+    });
+
+    // Confidence by Disease Bar Chart
+    const confidenceData = {{ disease_confidence| tojson }};
+    const confLabels = Object.keys(confidenceData);
+    const confValues = Object.values(confidenceData);
+
+    new Chart(document.getElementById('confidenceChart'), {
+        type: 'bar',
+        data: {
+            labels: confLabels,
+            datasets: [{
+                label: 'Average Confidence (%)',
+                data: confValues,
+                backgroundColor: '#17a2b8'
+            }]
+        },
+        options: {
+            responsive: true,
+            plugins: {
+                legend: {
+                    display: false
+                }
+            },
+            scales: {
+                y: {
+                    beginAtZero: true,
+                    max: 100
+                }
+            }
+        }
+    });
+</script>
+{% endblock %}

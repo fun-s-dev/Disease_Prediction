@@ -1,0 +1,29 @@
+Feature,Mean_Abs_SHAP
+Platelets,0.65214485
+Insulin,0.43413046
+BMI,0.4095306
+Red Blood Cells,0.38847786
+Mean Corpuscular Volume,0.35608265
+White Blood Cells,0.3012689
+Mean Corpuscular Hemoglobin,0.27279624
+Hematocrit,0.25269577
+HbA1c,0.24621923
+Hemoglobin,0.24082612
+Cholesterol,0.2268867
+Glucose,0.2186492
+Glucose_Insulin_Interaction,0.17581268
+ALT,0.1654309
+HDL Cholesterol,0.14805476
+Heart Rate,0.14309241
+C-reactive Protein,0.14284036
+Diastolic Blood Pressure,0.14203797
+LDL Cholesterol,0.14133891
+Triglycerides,0.13836564
+AST,0.13611408
+Mean Corpuscular Hemoglobin Concentration,0.13517871
+Systolic Blood Pressure,0.13133085
+LDL_HDL_Ratio,0.123015724
+Chol_HDL_Ratio,0.11571906
+MAP,0.10528166
+Creatinine,0.10522332
+Troponin,0.076069504
