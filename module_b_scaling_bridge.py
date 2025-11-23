@@ -26,28 +26,28 @@ class ScalingBridge:
         self.physiological_ranges = {
             'Glucose': (70, 140),  # mg/dL
             'Cholesterol': (125, 200),  # mg/dL
-            'Hemoglobin': (13.5, 17.5),  # g/dL
+            'Hemoglobin': (12, 18),  # g/dL
             'Platelets': (150000, 450000),  # per microliter of blood
             'White Blood Cells': (4000, 11000),  # per cubic millimeter of blood
-            'Red Blood Cells': (4.2, 5.4),  # million cells per microliter of blood
-            'Hematocrit': (38, 52),  # percentage
+            'Red Blood Cells': (4.0, 6.1),  # million cells per microliter of blood
+            'Hematocrit': (36, 54),  # percentage
             'Mean Corpuscular Volume': (80, 100),  # femtoliters
             'Mean Corpuscular Hemoglobin': (27, 33),  # picograms
             'Mean Corpuscular Hemoglobin Concentration': (32, 36),  # grams per deciliter
-            'Insulin': (5, 25),  # microU/mL
-            'BMI': (18.5, 24.9),  # kg/m^2
-            'Systolic Blood Pressure': (90, 120),  # mmHg
-            'Diastolic Blood Pressure': (60, 80),  # mmHg
-            'Triglycerides': (50, 150),  # mg/dL
-            'HbA1c': (4, 6),  # percentage
-            'LDL Cholesterol': (70, 130),  # mg/dL
-            'HDL Cholesterol': (40, 60),  # mg/dL
-            'ALT': (10, 40),  # U/L
+            'Insulin': (2, 25),  # microU/mL
+            'BMI': (18.5, 30),  # kg/m^2
+            'Systolic Blood Pressure': (90, 140),  # mmHg
+            'Diastolic Blood Pressure': (60, 90),  # mmHg
+            'Triglycerides': (50, 200),  # mg/dL
+            'HbA1c': (4, 6.5),  # percentage
+            'LDL Cholesterol': (50, 130),  # mg/dL
+            'HDL Cholesterol': (40, 80),  # mg/dL
+            'ALT': (7, 56),  # U/L
             'AST': (10, 40),  # U/L
             'Heart Rate': (60, 100),  # beats per minute
-            'Creatinine': (0.6, 1.2),  # mg/dL
+            'Creatinine': (0.6, 1.3),  # mg/dL
             'Troponin': (0, 0.04),  # ng/mL
-            'C-reactive Protein': (0, 3),  # mg/L
+            'C-reactive Protein': (0, 10),  # mg/L
             # Derived Features
             'LDL_HDL_Ratio': (0.5, 7.0),
             'Chol_HDL_Ratio': (1.0, 10.0),

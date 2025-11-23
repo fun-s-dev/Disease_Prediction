@@ -327,14 +327,14 @@ def dashboard():
             except:
                 # Default fallback ranges if not found in model
                 defaults = {
-                    'Glucose': (70, 140), 'Insulin': (5, 25), 'HbA1c': (4, 6), 'BMI': (18.5, 24.9),
-                    'Hemoglobin': (13.5, 17.5), 'Platelets': (150000, 450000), 'White Blood Cells': (4000, 11000),
-                    'Red Blood Cells': (4.2, 5.4), 'Hematocrit': (38, 52), 'Mean Corpuscular Volume': (80, 100),
+                    'Glucose': (70, 140), 'Insulin': (2, 25), 'HbA1c': (4, 6.5), 'BMI': (18.5, 30),
+                    'Hemoglobin': (12, 18), 'Platelets': (150000, 450000), 'White Blood Cells': (4000, 11000),
+                    'Red Blood Cells': (4.0, 6.1), 'Hematocrit': (36, 54), 'Mean Corpuscular Volume': (80, 100),
                     'Mean Corpuscular Hemoglobin': (27, 33), 'Mean Corpuscular Hemoglobin Concentration': (32, 36),
-                    'Systolic Blood Pressure': (90, 120), 'Diastolic Blood Pressure': (60, 80), 'Heart Rate': (60, 100),
-                    'Cholesterol': (125, 200), 'Triglycerides': (50, 150), 'LDL Cholesterol': (70, 130),
-                    'HDL Cholesterol': (40, 60), 'Troponin': (0, 0.04), 'C-reactive Protein': (0, 3),
-                    'ALT': (10, 40), 'AST': (10, 40), 'Creatinine': (0.6, 1.2)
+                    'Systolic Blood Pressure': (90, 140), 'Diastolic Blood Pressure': (60, 90), 'Heart Rate': (60, 100),
+                    'Cholesterol': (125, 200), 'Triglycerides': (50, 200), 'LDL Cholesterol': (50, 130),
+                    'HDL Cholesterol': (40, 80), 'Troponin': (0, 0.04), 'C-reactive Protein': (0, 10),
+                    'ALT': (7, 56), 'AST': (10, 40), 'Creatinine': (0.6, 1.3)
                 }
                 feature_ranges[feat] = defaults.get(feat, (0, 100))
     
@@ -344,24 +344,24 @@ def dashboard():
     # Healthy/normal default values for better UX
     healthy_defaults = {
         'Glucose': 95,
-        'Insulin': 12,
-        'HbA1c': 5.0,
-        'BMI': 22,
-        'Hemoglobin': 15.0,
+        'Insulin': 10,
+        'HbA1c': 5.2,
+        'BMI': 23,
+        'Hemoglobin': 14.5,
         'Platelets': 250000,
         'White Blood Cells': 7000,
-        'Red Blood Cells': 4.8,
+        'Red Blood Cells': 5.0,
         'Hematocrit': 45,
         'Mean Corpuscular Volume': 90,
         'Mean Corpuscular Hemoglobin': 30,
         'Mean Corpuscular Hemoglobin Concentration': 34,
-        'Systolic Blood Pressure': 110,
-        'Diastolic Blood Pressure': 70,
+        'Systolic Blood Pressure': 115,
+        'Diastolic Blood Pressure': 75,
         'Heart Rate': 72,
         'Cholesterol': 170,
         'Triglycerides': 100,
         'LDL Cholesterol': 100,
-        'HDL Cholesterol': 50,
+        'HDL Cholesterol': 55,
         'ALT': 25,
         'AST': 25,
         'Creatinine': 0.9,
@@ -379,6 +379,10 @@ def dashboard():
     missing = [f for f in display_feature_names if f not in feature_ranges]
     if missing:
         print(f"DEBUG: Missing features: {missing}")
+    
+    # Debug: Print Red Blood Cells range specifically
+    if 'Red Blood Cells' in feature_ranges:
+        print(f"DEBUG: Red Blood Cells range: {feature_ranges['Red Blood Cells']}")
     
     return render_template('dashboard.html', 
                          feature_names=display_feature_names,
