@@ -208,6 +208,9 @@ This software is for educational and research purposes only. It should NOT be us
 ## 👥 Authors
 
 **Gauraang Thakkar** - [Gauraangst](https://github.com/Gauraangst)
+**Aryan Tanna** - [Aryan](https://github.com/Aryan-Tanna)
+**Anjali Sinha** - [Anjali](https://github.com/fun-s-dev)
+**Parth Shah** - [Parth](https://github.com/parth-shah23)
 
 ## 🙏 Acknowledgments
 
